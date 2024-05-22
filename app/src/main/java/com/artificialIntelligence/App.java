@@ -5,9 +5,8 @@ package com.artificialIntelligence;
 
 
 
-import java.util.Scanner;
-import java.util.HashSet;
-import java.util.Set;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class XMLReader {
     public static void main(String[] args) {
@@ -29,14 +28,20 @@ public class XMLReader {
             Element root = document.getDocumentElement();
             NodeList nodeList = root.getChildNodes();
             
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode jsonNode = mapper.createObjectNode();
+            
             for (int i = 0; i < nodeList.getLength(); i++) {
                 if (nodeList.item(i) instanceof Element) {
                     Element element = (Element) nodeList.item(i);
                     if (selectedFields.contains(element.getNodeName())) {
-                        System.out.println("Field: " + element.getNodeName() + ", Value: " + element.getTextContent());
+                        jsonNode.put(element.getNodeName(), element.getTextContent());
                     }
                 }
             }
+            
+            String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+            System.out.println(jsonString);
         } catch (Exception e) {
             e.printStackTrace();
         }
