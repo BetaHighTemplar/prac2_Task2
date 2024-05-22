@@ -5,9 +5,18 @@ package com.artificialIntelligence;
 
 
 
-import java.util.InputMismatchException;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Scanner;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class XMLReader {
+public class SAXXMLReader {
     public static void main(String[] args) {
         try {
             Scanner scanner = new Scanner(System.in);
@@ -15,42 +24,53 @@ public class XMLReader {
             
             System.out.println("Enter fields to display (comma-separated): ");
             String[] fields = scanner.nextLine().split(",");
-            if (fields.length == 0) {
-                throw new InputMismatchException("No fields entered.");
-            }
             for (String field : fields) {
-                if (field.trim().isEmpty()) {
-                    throw new InputMismatchException("Field name cannot be empty.");
-                }
                 selectedFields.add(field.trim());
             }
             
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse("path/to/your/file.xml");
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser saxParser = factory.newSAXParser();
+            SAXHandler handler = new SAXHandler(selectedFields);
             
-            document.getDocumentElement().normalize();
-            Element root = document.getDocumentElement();
-            NodeList nodeList = root.getChildNodes();
+            saxParser.parse("path/to/your/file.xml", handler);
             
             ObjectMapper mapper = new ObjectMapper();
-            ObjectNode jsonNode = mapper.createObjectNode();
-            
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i) instanceof Element) {
-                    Element element = (Element) nodeList.item(i);
-                    if (selectedFields.contains(element.getNodeName())) {
-                        jsonNode.put(element.getNodeName(), element.getTextContent());
-                    }
-                }
-            }
-            
-            String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+            String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(handler.getJsonNode());
             System.out.println(jsonString);
-        } catch (InputMismatchException e) {
-            System.out.println("Input error: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+}
+
+class SAXHandler extends DefaultHandler {
+    private Set<String> selectedFields;
+    private ObjectNode jsonNode;
+    private String currentElement;
+
+    public SAXHandler(Set<String> selectedFields) {
+        this.selectedFields = selectedFields;
+        this.jsonNode = new ObjectMapper().createObjectNode();
+    }
+
+    public ObjectNode getJsonNode() {
+        return jsonNode;
+    }
+
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        currentElement = qName;
+    }
+
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+        if (currentElement != null && selectedFields.contains(currentElement)) {
+            jsonNode.put(currentElement, new String(ch, start, length));
+        }
+    }
+
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        currentElement = null;
     }
 }
