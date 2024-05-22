@@ -5,6 +5,170 @@ package com.artificialIntelligence;
 
 
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+public class XMLReader {
+    public static void main(String[] args) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse("path/to/your/file.xml");
+            
+            document.getDocumentElement().normalize();
+            Element root = document.getDocumentElement();
+            NodeList nodeList = root.getChildNodes();
+            
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                if (nodeList.item(i) instanceof Element) {
+                    Element element = (Element) nodeList.item(i);
+                    System.out.println("Field: " + element.getNodeName() + ", Value: " + element.getTextContent());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
+import java.util.Scanner;
+import java.util.HashSet;
+import java.util.Set;
+
+public class XMLReader {
+    public static void main(String[] args) {
+        try {
+            Scanner scanner = new Scanner(System.in);
+            Set<String> selectedFields = new HashSet<>();
+            
+            System.out.println("Enter fields to display (comma-separated): ");
+            String[] fields = scanner.nextLine().split(",");
+            for (String field : fields) {
+                selectedFields.add(field.trim());
+            }
+            
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse("path/to/your/file.xml");
+            
+            document.getDocumentElement().normalize();
+            Element root = document.getDocumentElement();
+            NodeList nodeList = root.getChildNodes();
+            
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                if (nodeList.item(i) instanceof Element) {
+                    Element element = (Element) nodeList.item(i);
+                    if (selectedFields.contains(element.getNodeName())) {
+                        System.out.println("Field: " + element.getNodeName() + ", Value: " + element.getTextContent());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+public class XMLReader {
+    public static void main(String[] args) {
+        try {
+            Scanner scanner = new Scanner(System.in);
+            Set<String> selectedFields = new HashSet<>();
+            
+            System.out.println("Enter fields to display (comma-separated): ");
+            String[] fields = scanner.nextLine().split(",");
+            for (String field : fields) {
+                selectedFields.add(field.trim());
+            }
+            
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse("path/to/your/file.xml");
+            
+            document.getDocumentElement().normalize();
+            Element root = document.getDocumentElement();
+            NodeList nodeList = root.getChildNodes();
+            
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode jsonNode = mapper.createObjectNode();
+            
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                if (nodeList.item(i) instanceof Element) {
+                    Element element = (Element) nodeList.item(i);
+                    if (selectedFields.contains(element.getNodeName())) {
+                        jsonNode.put(element.getNodeName(), element.getTextContent());
+                    }
+                }
+            }
+            
+            String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+            System.out.println(jsonString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+import java.util.InputMismatchException;
+
+public class XMLReader {
+    public static void main(String[] args) {
+        try {
+            Scanner scanner = new Scanner(System.in);
+            Set<String> selectedFields = new HashSet<>();
+            
+            System.out.println("Enter fields to display (comma-separated): ");
+            String[] fields = scanner.nextLine().split(",");
+            if (fields.length == 0) {
+                throw new InputMismatchException("No fields entered.");
+            }
+            for (String field : fields) {
+                if (field.trim().isEmpty()) {
+                    throw new InputMismatchException("Field name cannot be empty.");
+                }
+                selectedFields.add(field.trim());
+            }
+            
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse("path/to/your/file.xml");
+            
+            document.getDocumentElement().normalize();
+            Element root = document.getDocumentElement();
+            NodeList nodeList = root.getChildNodes();
+            
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode jsonNode = mapper.createObjectNode();
+            
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                if (nodeList.item(i) instanceof Element) {
+                    Element element = (Element) nodeList.item(i);
+                    if (selectedFields.contains(element.getNodeName())) {
+                        jsonNode.put(element.getNodeName(), element.getTextContent());
+                    }
+                }
+            }
+            
+            String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+            System.out.println(jsonString);
+        } catch (InputMismatchException e) {
+            System.out.println("Input error: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
