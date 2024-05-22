@@ -5,8 +5,7 @@ package com.artificialIntelligence;
 
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.InputMismatchException;
 
 public class XMLReader {
     public static void main(String[] args) {
@@ -16,7 +15,13 @@ public class XMLReader {
             
             System.out.println("Enter fields to display (comma-separated): ");
             String[] fields = scanner.nextLine().split(",");
+            if (fields.length == 0) {
+                throw new InputMismatchException("No fields entered.");
+            }
             for (String field : fields) {
+                if (field.trim().isEmpty()) {
+                    throw new InputMismatchException("Field name cannot be empty.");
+                }
                 selectedFields.add(field.trim());
             }
             
@@ -42,10 +47,10 @@ public class XMLReader {
             
             String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
             System.out.println(jsonString);
+        } catch (InputMismatchException e) {
+            System.out.println("Input error: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
-
-
