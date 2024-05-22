@@ -4,15 +4,23 @@
 package com.artificialIntelligence;
 
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+
+import java.util.Scanner;
+import java.util.HashSet;
+import java.util.Set;
 
 public class XMLReader {
     public static void main(String[] args) {
         try {
+            Scanner scanner = new Scanner(System.in);
+            Set<String> selectedFields = new HashSet<>();
+            
+            System.out.println("Enter fields to display (comma-separated): ");
+            String[] fields = scanner.nextLine().split(",");
+            for (String field : fields) {
+                selectedFields.add(field.trim());
+            }
+            
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse("path/to/your/file.xml");
@@ -24,7 +32,9 @@ public class XMLReader {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 if (nodeList.item(i) instanceof Element) {
                     Element element = (Element) nodeList.item(i);
-                    System.out.println("Field: " + element.getNodeName() + ", Value: " + element.getTextContent());
+                    if (selectedFields.contains(element.getNodeName())) {
+                        System.out.println("Field: " + element.getNodeName() + ", Value: " + element.getTextContent());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -32,3 +42,5 @@ public class XMLReader {
         }
     }
 }
+
+
